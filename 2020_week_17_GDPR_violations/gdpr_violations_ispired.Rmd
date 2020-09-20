@@ -1,0 +1,320 @@
+---
+title: "GDPR_VIOLATIONS"
+author: "Christopher Okoth"
+date: "8/26/2020"
+output: html_document
+---
+```{r}
+library(tidyverse)
+library(forcats)
+library(hrbrthemes)
+library(RColorBrewer)
+library(gt)
+library(webshot)
+library(patchwork)
+# install.packages("patchwork")
+# this notebook was  a work of DR Eva Murzyn https://github.com/EvaMurzyn
+```
+
+
+```{r}
+# loading the data 
+gdpr_violations <- readr::read_tsv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-04-21/gdpr_violations.tsv')
+gdpr_text <- readr::read_tsv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-04-21/gdpr_text.tsv')
+
+# str(gdpr_violations)
+
+options(scipen = 999) #remove scientific notation
+gdpr_violations
+```
+
+
+
+
+
+```{r}
+###Most expensive violation type by country!------------------
+
+exp_country <- gdpr_violations %>% 
+  group_by(name) %>% 
+  arrange(price) %>% 
+  top_n(1, price) %>% 
+  ungroup() %>% 
+  distinct()
+
+```
+
+
+
+
+```{r}
+# create a grouping factor to create our 2 graphs
+exp_country$name <- as.factor(exp_country$name)
+exp_country <- exp_country %>% mutate(price_size = 
+                         ifelse(price > 2000000, "High", "Low")) 
+
+```
+
+
+
+
+
+```{r fig.width=10}
+#graph of all
+lg_plot <- exp_country %>% 
+  filter(id !=8) %>% # removing double Greece entry
+  mutate(name = fct_reorder(name, price)) %>%
+  mutate(price = price/1000) %>% 
+  ggplot(aes(x = name, y = price, fill = str_wrap(type,30))) +
+  geom_bar(stat = "identity")+
+  labs(title = "Largest GDPR violations for each country",fill="Type of Violation") +
+  xlab("Country") + ylab("Fine in thousands of Euro")+
+  coord_flip() +
+ ggthemes::theme_base()+
+  ggsci::scale_fill_aaas()+theme(legend.position ="right",
+                                legend.key.height=unit(1.5, "cm"))
+```
+
+
+
+
+
+
+
+
+
+
+```{r fig.width=10}
+# just the smaller fines [zoom!]
+sm_plot <- exp_country %>% 
+  filter(id !=8) %>% # removing double Greece entry
+  filter(price_size == "Low") %>% 
+  mutate(name = fct_reorder(name, price)) %>%
+  mutate(price = price/1000) %>% 
+  ggplot(aes(x = name, y = price, fill = str_wrap(type,30))) +
+  geom_bar(stat = "identity") +
+  labs(title = "Largest GDPR violations\n per country[zoomed]",fill="Type of violation") +
+  xlab("Country") + ylab("Fine in thousands of Euro") +
+  coord_flip() +ggthemes::theme_base()+
+  ggsci::scale_fill_aaas()+theme(legend.position ="none",
+                                legend.key.height=unit(1.4, "cm"))
+```
+
+
+
+
+
+
+
+```{r}
+gdpr_violations[gdpr_violations$id == 99, 9] = "Failure to implement sufficient measures to ensure information security"
+gdpr_violations[gdpr_violations$id == 99, 8] = "Art. 32 GDPR"
+gdpr_violations[gdpr_violations$id == 89, 9] = "Unknown"
+gdpr_violations[gdpr_violations$id == 37, 9] = "Unknown"
+
+```
+
+
+
+```{r fig.width=15}
+# # patch the two plots together
+# patchwork::
+two_plots <- lg_plot+sm_plot
+
+  ggsave("gdpr_fines.png",dpi = 400,height = 10,width = 20,units = "in")
+```
+
+
+
+```{r}
+exp_type <- gdpr_violations %>% 
+  mutate(count = 1) %>% 
+  group_by(type) %>%
+  summarise(count = sum(count), mean_fine = mean(price), min = min(price), max = max(price)) %>% 
+  arrange(desc(mean_fine))
+
+
+#gt table of mean, min and max fines by type
+gt <- exp_type %>% 
+  gt(rowname_col = "type")  %>% 
+  tab_header(title = "Mean GDPR fines per violation type") %>% 
+  tab_stubhead(label = "Violation type") %>% 
+  cols_label(mean_fine = html("Mean fine"), count = html("Number of incidents"), 
+             min = html("Minimum fine"), max = html("Maximum fine")) %>% 
+  fmt_currency(columns = vars(mean_fine, min, max), currency = "euro")
+
+gt %>% gtsave("table_gdpr_violations.png")
+gt %>% gtsave("gdpr.html")
+```
+
+
+
+```{r}
+pack_bars <- function(data, number_rows, value_column, fill_color = "#4B384C", border_color = "white") {
+  
+  value_column <- ensym(value_column)  
+  
+  color_bar_data <- data %>% 
+    top_n(number_rows, !!value_column) %>% 
+    arrange(desc(!!value_column))
+  
+  # calc row height based on num rows
+  bar_h = 1/number_rows
+  
+  color_bars <- color_bar_data %>% 
+    mutate(fill = fill_color,
+           color = border_color,
+           xmin = 0,
+           xmax = !!value_column,
+           ymin = map_dbl(1:number_rows, ~1 - bar_h*(.x-1)),
+           ymax = map_dbl(1:number_rows, ~1 - bar_h*.x))
+  
+  gray_bar_data <- data %>% 
+    anti_join(color_bar_data) %>% 
+    arrange(desc(!!value_column))
+  
+  #get max x level for each bar level
+  row_sums <- pull(color_bar_data, !!value_column)
+  
+  #gen gray ramp function
+  gray_gen <- colorRampPalette(c("#E8E8E8", "#cccccc"))
+  
+  #gen gray ramp
+  grays <- gray_gen(105)
+  low_grays <- grays[1:50]
+  hi_grays  <- grays[56:105]
+  
+  last_gray <- sample(c(low_grays, hi_grays), number_rows, replace = TRUE)
+  
+  gray_bar_list <- vector('list', nrow(gray_bar_data))
+  
+  
+  for (i in 1:nrow(gray_bar_data)) {
+    
+    row <- gray_bar_data[i,]
+    
+    # Determine placing of each block by looking at the minium starting values of colored bars
+    # adding on the new block and setting value to represent the new block length
+    vert_pos <- which.min(row_sums + pull(row, !!value_column))
+    
+    # Assign alternating random grays to fill
+    if (i == 1) {
+      
+      gray_fill <- sample(low_grays, 1)
+      
+    } else {
+      
+      last_gray <- last_gray[vert_pos]
+      
+      gray_fill <- ifelse(last_gray %in% low_grays, sample(hi_grays, 1), sample(low_grays, 1))
+    }
+    
+    last_gray[vert_pos] <- gray_fill
+    
+    # Generate aes for geom_rect
+    gray_bar_list[[i]]  <- mutate(row, 
+                                  fill = gray_fill,
+                                  color = border_color,
+                                  xmin = row_sums[[vert_pos]],
+                                  xmax = row_sums[[vert_pos]] + !!value_column,
+                                  ymin = map_dbl(1:number_rows, ~1 - bar_h*(.x-1))[[vert_pos]],
+                                  ymax = map_dbl(1:number_rows, ~1 - bar_h*.x)[[vert_pos]]
+    )
+    
+    # Assign the new color_bar + rectangle as the max value for that row 
+    row_sums[[vert_pos]] <- gray_bar_list[[i]]$xmax
+    
+  }
+  
+  gray_bars <- bind_rows(gray_bar_list)
+  
+  bind_rows(color_bars, gray_bars)
+  
+}
+```
+
+
+```{r fig.width=10}
+plot_data <- gdpr_violations %>% 
+  group_by(controller) %>% 
+  mutate(controller = if_else(str_detect(controller, "Google"), "Google", controller)) %>% 
+  summarize(price = sum(price),
+            number = n()) %>% 
+  pack_bars(6, price, fill_color = "#2f9c95")
+
+
+stacked <- ggplot(plot_data) +
+  geom_rect(aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill, color = "green"), size = 0.2) +
+  geom_text(data = filter(plot_data, fill == "#2f9c95"), aes(x = xmin, y = (ymin + ymax)/2, label = controller, color = "white"), family = "Oswald",  nudge_x = 100000, hjust = 0, size = 5) +
+  scale_fill_identity() +
+  scale_color_identity() +
+  scale_x_continuous(labels = scales::dollar, limits = c(0, 60000000), breaks = seq(0, 60000000, 10000000)) +
+  labs(x = NULL,
+       y = NULL,
+       title = "Six Companies Have the Infamous Honour of GDPR Violations High Scores",
+       caption = "**Data**: Privacy Affairs | **Graphic**: @chris_okoth") +
+  theme(axis.text.y = element_blank(),
+        axis.title = element_text(size = 26),
+        axis.ticks.y = element_blank(),
+        axis.text.x = element_markdown(size = 12),
+        axis.ticks = element_line(color = "#E5E9F0"))
+
+library(glue)
+library(ggtext)
+#HS Plot ----
+```
+
+
+
+```{r}
+high_score <- gdpr_violations %>% 
+  group_by(controller) %>% 
+  mutate(controller = if_else(str_detect(controller, "Google"), "Google", controller)) %>% 
+  summarize(price = sum(price)) %>% 
+  arrange(desc(price)) %>% 
+  slice(1:10) %>% 
+  mutate(idx = rev(row_number()),
+         place = as.character(row_number()),
+         price = dollar(price)) %>% 
+  pivot_longer(-idx) %>% 
+  mutate(hjust = case_when(name == "price" ~ 1,
+                           name == "controller" ~ 0,
+                           TRUE ~ 1)) %>% 
+  mutate(x = case_when(name == "place" ~ 0.9,
+                       name == "price" ~ 1.7,
+                       name == "controller" ~ 1.9)) %>% 
+  mutate(xend = case_when(idx == 1 ~ 5,
+                          TRUE ~ 3))
+
+prices <- plot_data %>% 
+  slice(1:10) %>% 
+  pull(price)
+
+segments <- tibble(price = prices,
+                   x = 1.9,
+                   xend = 1.9 + 4*price/max(price),
+                   idx = rev(1:10))
+
+
+hs_plot <- ggplot(high_score, aes(x = x, y = idx)) +
+  geom_segment(data = segments, aes(x = x, xend = xend, y = idx, yend = idx), color = "#2f9c95", size = 9, alpha = 0.5) +
+  geom_text(aes(label = value, hjust = hjust), family = "Hyperspace Bold", color = "white", size = 6) +
+  annotate("text", x = 2, y = 12, label = "GDPR VIOLATIONS HIGH SCORES", family = "Hyperspace Bold", color = "white", size = 8) +
+  annotate("text", x = 2, y = -2, label = "1   COIN  1  PLAY", family = "Hyperspace Bold", color = "white", size = 8) +
+  annotate("text", x = 2, y = -4, label = "2020 Graphic: @jakekaupp | Data: Privacy Affairs", family = "Hyperspace Bold", color = "white", size = 4) +
+  scale_x_discrete(limits = c("place", "price", "controller")) +
+  labs(x = NULL,
+       y = NULL) +
+  theme(plot.background = element_rect(fill = "#111111", color = NA),
+        panel.grid = element_blank(),
+        panel.background = element_rect(fill = "#111111", color = NA),
+        axis.ticks = element_blank(),
+        axis.text = element_blank())
+
+stacked
+
+ggsave("gdpr_for_top_companies4.png",plot = stacked,dpi = 600,height =8,width =10,units = "in")
+
+install.packages("rsconnect")
+```
+
