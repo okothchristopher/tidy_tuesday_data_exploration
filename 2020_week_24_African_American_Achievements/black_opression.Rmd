@@ -1,0 +1,51 @@
+---
+title: "SLAVES AND DETAILS-BLACK OPRESSION"
+author: "christopher okoth"
+date: "6/16/2020"
+output: html_document
+---
+```{r}
+#load the data and packages 
+tuesdata <- tidytuesdayR::tt_load(2020, week = 25)
+
+library(tidyverse)
+
+blackpast <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-06-16/blackpast.csv')
+census <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-06-16/census.csv')
+slave_routes <-read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-06-16/slave_routes.csv')
+
+african_names <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-06-16/african_names.csv')
+
+
+
+```
+
+
+
+### data exploration 
+```{r}
+blackpast %>% view()
+african_names %>% view()
+
+african_names %>% 
+  group_by(voyage_id) %>% 
+  summarise(number=n()) %>% 
+  ungroup()
+  
+
+slave_routes %>% view()
+
+blackpast %>% view()
+blackpast %>% count(era)
+census %>% view()
+```
+
+
+
+
+### data visualization serious 
+
+
+
+
+# modelling (if applicable )
