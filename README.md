@@ -15,6 +15,7 @@ week 17 2020| GDPR Violations |[european fines plot](https://github.com/okothchr
 <div class="row"> 
   <div class="column">
 	  <a href="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_20_volcano_erruptions"><img src="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_20_volcano_erruptions/erruptions.gif"></a>
+	    <a href=""><img src="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_36_crop_yields/changesInCropYieldsInKenya.png"></a>
   	<a href="https://github.com/okothchristopher/tidy_tuesday_data_exploration/tree/master/2020_week_13_TBI"><img src="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_13_TBI/traumatic_brain_injury_by_age_intentional_causes_and_others.png"></a>
 	<a href="https://github.com/okothchristopher/tidy_tuesday_data_exploration/tree/master/2020_week_15_Toure%20de%20France"><img src="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_13_Toure%20de%20France/tourdefrance%20in%202017.gif"></a>
   	<a href="https://github.com/okothchristopher/tidy_tuesday_data_exploration/tree/master/2020_week_14_beer_production"><img src="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_14_beer_production/top_ten_on_premises.png"></a>
