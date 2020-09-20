@@ -7,10 +7,11 @@ Week 15 2020| Toure de France| [gif](https://github.com/okothchristopher/tidy_tu
 week 24 2020| African American Achievemnts|[black_accomplishemnents plotly object](https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_24_African_American_Achievements/black_accomplishments.html)|
 week 13 2020| Traumatic Brain Injury |[plot](https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_13_TBI/traumatic_brain_injury_by_age_intentional_causes_and_others.png)|
 week 14 2020| Beer Production |[beer plot](https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_14_beer_production/top_ten_on_premises.png)|
+week 17 2020| GDPR Violations |[european fines plot](https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_17_GDPR_violations/gdpr_fines.png)|
 
 
 ---
-### Highlights (click on image to go to code repository): <br>
+###  (click on image to go to code repository): <br>
 <div class="row"> 
   <div class="column">
 	  <a href="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_20_volcano_erruptions"><img src="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_20_volcano_erruptions/erruptions.gif"></a>
@@ -20,7 +21,8 @@ week 14 2020| Beer Production |[beer plot](https://github.com/okothchristopher/t
 	<a href="https://github.com/okothchristopher/tidy_tuesday_data_exploration/tree/master/2020_week_14_beer_production"><img src="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_14_beer_production/beer_bar_race.gif"></a>
   	<a href="https://github.com/okothchristopher/tidy_tuesday_data_exploration/tree/master/2020_week_14_beer_production"><img src="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_14_beer_production/trend_of_breweries.png"></a>
   	<a href="https://github.com/okothchristopher/tidy_tuesday_data_exploration/tree/master/2020_week_24_African_American_Achievements"><img src="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_24_African_American_Achievements/achievemnts%20by%20gender.png"></a>
-<a href="">
+<a href="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_17_GDPR_violations"><img src="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_17_GDPR_violations/gdpr_fines.png"></a>
+       <a href="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_17_GDPR_violations"><img src="https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_17_GDPR_violations/gdpr_for_top_companies4.png"></a>
   </div>
 </div>
 
