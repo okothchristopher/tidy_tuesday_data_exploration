@@ -34,5 +34,3 @@ Tuff cones are also types of Maars. Calderas are also found at the summit of Shi
 
 -----
 
-[Week13](https://github.com/okothchristopher/tidy_tuesday_data_exploration/tree/master/2020_week_13_TBI)
-![Brain Injury plot](https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_13_TBI/traumatic_brain_injury_by_age_intentional_causes_and_others.png)
