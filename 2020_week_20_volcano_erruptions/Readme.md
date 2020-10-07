@@ -1,10 +1,11 @@
----
-###  (click on image to go to code repository): 
+
 
 ------
 [Week 20](https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_20_volcano_erruptions)
 
-This week was on exploring the different volcanoes recorded around the world. 
+![Global Distribution of volcanoes](https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_20_volcano_erruptions/volcanos_across_the_globe.png)
+ The following shows the explosions in the provided timeline 
+ 
 ![VolcanoGIF](https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_20_volcano_erruptions/erruptions.gif)
 
 The following are types of volcanoes :
