@@ -15,7 +15,6 @@ week 17 2020| GDPR Violations |[european fines plot](https://github.com/okothchr
 [Week 20](https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_20_volcano_erruptions)
 
 This week was on exploring the different volcanoes recorded around the world. 
-![VolcanoGIF](https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_20_volcano_erruptions/erruptions.gif)
 
 The following are types of volcanoes :
 >1. **Composite Volcanoes**
@@ -43,8 +42,7 @@ Tuff cones are also types of Maars. Calderas are also found at the summit of Shi
 
 -----
 
-[Week13](https://github.com/okothchristopher/tidy_tuesday_data_exploration/tree/master/2020_week_13_TBI)
-![Brain Injury plot](https://github.com/okothchristopher/tidy_tuesday_data_exploration/blob/master/2020_week_13_TBI/traumatic_brain_injury_by_age_intentional_causes_and_others.png)
+
 
 
 ------
