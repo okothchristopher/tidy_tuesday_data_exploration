@@ -1,0 +1,169 @@
+---
+title: "CROP YIELDS EXPLORING"
+author: "Christopher Okoth"
+date: "9/20/2020"
+output: html_document
+---
+```{r}
+library(tidyverse)
+library(tidytuesdayR)
+options(scipen = 999)
+library(patchwork)
+library(ggpubr)
+library(ggtext)
+```
+
+
+ Load the data 
+```{r}
+
+######################## simple data cleaning  
+
+tuesdata <- tidytuesdayR::tt_load(2020, week = 36)
+crop_yields <- tuesdata$key_crop_yields%>%
+  janitor::clean_names() %>% 
+  # we map this function to every variable name with toones 
+  rename_all(.funs = str_remove,"_tonnes.*")
+
+
+# the lower the arable land needed the less number of crops and the more one gets a higher crop yiled efficiency 
+arable_land <- tuesdata$arable_land_pin %>% 
+  janitor::clean_names() %>% 
+  rename(arable_land_needed=4) 
+
+land_use <- tuesdata$land_use_vs_yield_change_in_cereal_production %>% 
+  janitor::clean_names() %>% 
+  rename(total_population=6,change_in_land_use=5)
+
+tractor <- tuesdata$cereal_yields_vs_tractor_inputs_in_agriculture %>%
+  janitor::clean_names() %>% 
+  rename(cereal_yield_per_kg_per_ha=5,total_pop=6)
+
+fertilizer <- tuesdata$cereal_crop_yield_vs_fertilizer_application %>%
+  janitor::clean_names() %>% 
+  rename(nitrogen_fert_per_km_per_ha=5)
+```
+
+
+```{r}
+# land_use %>%
+#   mutate(year=parse_number(year)) %>% 
+#   filter(year==max(year))
+```
+
+
+
+```{r}
+yield_tidy<- crop_yields %>%
+  pivot_longer(cols = 4:ncol(crop_yields),
+               names_to="crop",
+               values_to="yield") %>%
+  filter(!is.na(yield))
+```
+
+
+### simple data visualizations 
+```{r fig.width=15,fig.height=10}
+us_plot <- yield_tidy %>% 
+  filter(entity=='United States') %>% 
+  # this way we shall have the crop with a higher yield on top 
+  mutate(crop=fct_reorder(crop,-yield)) %>% 
+  ggplot(aes(year,yield))+
+  geom_line(show.legend = F,size=1,color="navy")+
+  geom_point(color="navy",size=.8)+
+  facet_wrap(~crop,scales = "free")+
+  ggthemes::theme_economist()+
+  ggtitle("CHANGES IN CROP YIELDS OVER TIME IN <span style='color:navy'>USA</span>   "
+  )+
+  theme(plot.background = element_rect(fill="lightyellow"),
+        plot.title = element_markdown(hjust = 0.5))
+
+
+china_plot <- yield_tidy %>% 
+  filter(entity=='China') %>% 
+  # this way we shall have the crop with a higher yield on top 
+  mutate(crop=fct_reorder(crop,-yield)) %>% 
+  ggplot(aes(year,yield))+
+  geom_line(show.legend = F,size=0.7,color="red")+
+  geom_point(color="red",size=.6)+
+  facet_wrap(~crop,scales = "free")+
+  ggthemes::theme_economist()+
+  ggtitle("CHANGES IN CROP YIELDS OVER TIME IN <span style='color:red'>CHINA</span> "
+  )+
+  theme(plot.background = element_rect(fill="lightyellow"),
+        plot.title = element_markdown(hjust = 0.5))
+
+
+kenya_plot <- yield_tidy %>% 
+  filter(entity=='Kenya') %>% 
+  # this way we shall have the crop with a higher yield on top 
+  mutate(crop=fct_reorder(crop,-yield)) %>% 
+  ggplot(aes(year,yield))+
+  geom_line(show.legend = F,size=0.6,color="forestgreen")+
+  geom_point(color="forestgreen",size=.5)+
+  facet_wrap(~crop,scales = "free")+
+  ggthemes::theme_economist()+
+  ggtitle("CHANGES IN CROP YIELDS OVER TIME IN <span style='color:forestgreen'>KENYA</span> "
+  )+
+  theme(plot.background = element_rect(fill="lightyellow"),
+        plot.title =element_markdown(hjust = 0.5))
+
+world_plot <- yield_tidy %>% 
+  filter(entity%in%c('United States','China','Kenya')) %>% 
+  mutate(crop=fct_reorder(crop,-yield)) %>% 
+  ggplot(aes(year,yield,color=entity))+
+  geom_line(show.legend = T,size=1.2)+
+  facet_wrap(~crop,scales = "free")+
+  scale_color_manual(values = c("red","forestgreen","navy"))+
+  ggthemes::theme_economist()+
+  ggtitle("CHANGES IN CROP YIELDS IN TONNES PER HECTARE<br /> OVER TIME IN <span style='color:red'>CHINA</span>,
+          <span style='color:forestgreen'>KENYA</span>,<span style='color:navy'>USA</span> ")+
+  theme(plot.background = element_rect(fill="lightyellow"),
+        plot.title = element_markdown(hjust = .5),
+        legend.title = element_blank(),
+        strip.background.x = element_rect(fill = "lightyellow2",
+                                        linetype = "blank"),
+        strip.text.x =element_text(face = "bold",
+                                    color = "black", size = 13))
+  # ggsave("changesInCropYieldsInKenya.png",width = 8,height = 6,units = "in")
+
+ggpubr::ggarrange(world_plot,kenya_plot,china_plot,us_plot)
+ggsave("crop_production_efficiency.png",height = 10,width = 15,units = "in",dpi = 500)
+```
+
+Kenya - The yields of crops in tonnes per hectare have been steadily rising since the 1960's . This can be attributed to the extensive use of modern agricultural methods and use of pesticides. 
+The crops maize, soybeans and bananas have a relatively lower yield in tones per hectare compared to their counterparts.
+
+Beans saw its peak yield per hectare in the 1980's but fell drastically in years heading to 2000. It has seen a steady rise ever since but has not rebounded to its former glory. 
+
+The crop production efficiency in Kenya however, compared to other major countries like the US and China, is more turbulent, ie there are regular fluctuations in the yields per hectare of the crops under study. 
+
+The USA does not produce cassava while China does't have peas. The USA has a higher maize,potato,soybeans, peas and beans production efficiency compare to the other two nations. This is indicative of better crop production methods and mechanization. 
+
+
+
+```{r}
+# yield_tidy %>% write_rds("crop_yields_shiny/yields_tidy.rds")
+# 
+# yield_tidy <- read_rds("crop_yields_shiny/yields_tidy.rds")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
